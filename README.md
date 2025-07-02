@@ -16,7 +16,7 @@ name = 'Coumba', ==> 'Hello Coumba !'
 http://localhost:3000/hello?name=Pathé
 name = 'Pathé', ==> 'Hello Pathé !'
 
-## II Exercice
+## II. Exercice
 ### 1 - Modifier le endpoint '/hello' pour dire si l'utilisateur il a plus de 18 ans
 http://localhost:3000/hello?name=Coumba,age=10
 name='Coumba',age=10 ==> 'Hello Coumba, vous ête mineur(e)!'
