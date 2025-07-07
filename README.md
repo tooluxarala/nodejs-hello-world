@@ -4,9 +4,9 @@ node -v // pour afficher la version
 npm -v // pour afficher la version 
 
 ## II. Hello world app
-### 1 - créer un fichier server.js
+### 1 - créer un fichier server.mjs
 ### 2 - ajouter la ligne suivante console.log("Hello World !");
-### 3 - lancer le programme avec ``node server.js``. Vous devez voir le message 'Hello World !'
+### 3 - lancer le programme avec ``node server.mjs``. Vous devez voir le message 'Hello World !'
 ### 4 - créer avec le module Http un endpoint '/hello' qui retourne le message 'Hello World !'
 ### 5 - Modifier le endpoint '/hello' pour prendre un paramètre 'name' et l'afficher comme suit :
 'Hello <name> !'
