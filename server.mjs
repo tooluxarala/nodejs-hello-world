@@ -1,40 +1,79 @@
-import express from 'express';
+import { createServer } from 'http';
+import { parse } from 'url';
 
-const app = express();
+const hostname = '127.0.0.1';
 const port = 3000;
 
-// mineur/majeur
-app.get('/hello', (req, res) => {
-    const name = req.query.name;
-    const age = parseInt(req.query.age);
+const users = [
+    { name: "Pathé", birth: 2000 },
+    { name: "Coumba", birth: 2010 },
+    { name: "Samba", birth: 2005 },
+    { name: "Codou", birth: 2015 },
+    { name: "Demba", birth: 2020 }
+];
 
-    if (name && !isNaN(age)) {
-        if (age >= 18) {
-            res.send(`Hello ${name}, vous êtes majeur(e) !`);
+const currentYear = new Date().getFullYear();
+
+const server = createServer((req, res) => {
+    const { pathname, query } = parse(req.url, true);
+    res.writeHead(200, { 'Content-Type': 'text/plain; charset=utf-8' });
+
+    // 1. Endpoint /hello
+    if (pathname === '/hello') {
+        const name = query.name || 'Inconnu';
+        const age = parseInt(query.age);
+
+        if (!isNaN(age)) {
+            const status = age >= 18 ? 'majeur(e)' : 'mineur(e)';
+            res.end(`Hello ${name}, vous êtes ${status} !\n`);
         } else {
-            res.send(`Hello ${name}, vous êtes mineur(e) !`);
+            res.end(`Hello ${name} !\n`);
         }
-    } else if (name) {
-        res.send(`Hello ${name} !`);
+
+        // 2. Endpoint /age
+    } else if (pathname === '/age') {
+        const name = query.name || 'Inconnu';
+        const birth = parseInt(query.birth);
+
+        if (!isNaN(birth)) {
+            const age = currentYear - birth;
+            res.end(`Hello ${name}, vous avez ${age} ans\n`);
+        } else {
+            res.end('Veuillez fournir une année de naissance valide.\n');
+        }
+
+        // 3. Endpoint /whoami
+    } else if (pathname === '/whoami') {
+        let person = null;
+
+        if (query.name) {
+            person = users.find(u => u.name.toLowerCase() === query.name.toLowerCase());
+        } else if (query.birth) {
+            const birth = parseInt(query.birth);
+            person = users.find(u => u.birth === birth);
+        }
+
+        if (person) {
+            const age = currentYear - person.birth;
+            res.end(`Vous êtes ${person.name}, vous avez ${age} ans\n`);
+        } else {
+            res.end('Utilisateur non trouvé.\n');
+        }
+
+        // 4. Endpoint /students
+    } else if (pathname === '/students') {
+        const minors = users.filter(u => currentYear - u.birth < 18);
+        const result = minors
+            .map(u => `${u.name} (${currentYear - u.birth} ans)`)
+            .join(',\n');
+        res.end(result || 'Aucun mineur trouvé.\n');
+
+        // Default route
     } else {
-        res.send('Hello World !');
+        res.end('Bienvenue sur le serveur Node.js !\n');
     }
 });
 
-//  pour calculer l'âge avec l'année de naissance
-app.get('/age', (req, res) => {
-    const name = req.query.name;
-    const birth = parseInt(req.query.birth);
-    const currentYear = new Date().getFullYear();
-
-    if (name && !isNaN(birth)) {
-        const age = currentYear - birth;
-        res.send(`Hello ${name}, vous avez ${age} ans`);
-    } else {
-        res.send('Merci de fournir un nom et une année de naissance');
-    }
-});
-
-app.listen(port, () => {
-    console.log(`Serveur en écoute sur http://localhost:${port}`);
+server.listen(port, hostname, () => {
+    console.log(`✅ Serveur lancé sur http://${hostname}:${port}/`);
 });
